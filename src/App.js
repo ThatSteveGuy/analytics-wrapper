@@ -1,34 +1,52 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Analytics } from './analytics/Analytics';
+import { AnalyticsProvider } from './analytics/Analytics';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { setVal } from './reducers';
 import Main from './components/Main';
+import Alt from './components/Alt';
+import createHistory from 'history/createBrowserHistory';
+import { ConnectedRouter } from 'react-router-redux';
+import { Route } from 'react-router';
+import { NavLink } from 'react-router-dom';
+import config from './config';
 
 const store = createStore(setVal, { testVal: 9999 });
-const initAnalytics = {
-  providerKey: null,
-  withLogging: true,
-  withOptimizely: false,
-  active: true
+const { analytics } = config;
+const history = createHistory();
+
+const analyticsConfig = {
+  apiKey: analytics.apiKey,
+  withLogging: analytics.withLogging,
+  withABTesting: analytics.withABTesting,
+  active: analytics.active,
+  deviceId: analytics.deviceId
 };
+
 class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Analytics value={initAnalytics}>
-          <div className="App">
-            <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <h1 className="App-title">Analytics Wrapper Strawman</h1>
-            </header>
-            <p className="App-intro">
-              <Main/>
-            </p>
-          </div>
-        </Analytics>
+        <ConnectedRouter history={history}>
+          <AnalyticsProvider value={analyticsConfig}>
+            <div className="App">
+              <header className="App-header">
+                <img src={logo} className="App-logo" alt="logo" />
+                <h1 className="App-title">Analytics Wrapper Strawman</h1>
+              </header>
+              <div className="App-intro">
+                <Route exact path="/" component={Main} />
+                <Route path="/alt" component={Alt} />
+              </div>
+              <div className="navigation">
+                <NavLink className='button' to='/'> Main </NavLink>
+                <NavLink className='button' to='/Alt'> Alt </NavLink>
+              </div>
+            </div>
+            </AnalyticsProvider>
+          </ConnectedRouter>
       </Provider>
     );
   }
