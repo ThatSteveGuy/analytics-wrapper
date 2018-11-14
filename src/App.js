@@ -7,15 +7,13 @@ import { Provider } from 'react-redux';
 import { setVal } from './reducers';
 import Main from './components/Main';
 import Alt from './components/Alt';
-import createHistory from 'history/createBrowserHistory';
-import { ConnectedRouter } from 'react-router-redux';
-import { Route } from 'react-router';
-import { NavLink } from 'react-router-dom';
+import { Route, Switch } from 'react-router';
+import { NavLink, BrowserRouter } from 'react-router-dom';
 import config from './config';
 
 const store = createStore(setVal, { testVal: 9999 });
 const { analytics } = config;
-const history = createHistory();
+// const history = createHistory();
 
 const analyticsConfig = {
   apiKey: analytics.apiKey,
@@ -29,7 +27,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <ConnectedRouter history={history}>
+        <BrowserRouter>
           <AnalyticsProvider value={analyticsConfig}>
             <div className="App">
               <header className="App-header">
@@ -37,8 +35,10 @@ class App extends Component {
                 <h1 className="App-title">Analytics Wrapper Strawman</h1>
               </header>
               <div className="App-intro">
-                <Route exact path="/" component={Main} />
-                <Route path="/alt" component={Alt} />
+                <Switch>
+                  <Route exact path="/" component={Main} />
+                  <Route path="/alt" component={Alt} />
+                </Switch>
               </div>
               <div className="navigation">
                 <NavLink className='button' to='/'> Main </NavLink>
@@ -46,7 +46,7 @@ class App extends Component {
               </div>
             </div>
             </AnalyticsProvider>
-          </ConnectedRouter>
+          </BrowserRouter>
       </Provider>
     );
   }
